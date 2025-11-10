@@ -28,7 +28,11 @@ async function run() {
       const result = await courseCollection.find().limit(6).toArray();
       res.send(result);
     });
-   
+
+    app.get("/course", async (req, res) => {
+      const result = await courseCollection.find().toArray();
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
