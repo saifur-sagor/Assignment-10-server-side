@@ -21,7 +21,14 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    
+    const db = client.db("e_learning_db");
+    const courseCollection = db.collection("course");
+
+    app.get("/course", async (req, res) => {
+      const result = await courseCollection.find().limit(6).toArray();
+      res.send(result);
+    });
+   
 
     await client.db("admin").command({ ping: 1 });
     console.log(
