@@ -23,24 +23,30 @@ async function run() {
     await client.connect();
     const db = client.db("e_learning_db");
     const courseCollection = db.collection("course");
-
+    // six data api
     app.get("/course", async (req, res) => {
       const result = await courseCollection.find().limit(6).toArray();
       res.send(result);
     });
-
+    // all data api
     app.get("/courses", async (req, res) => {
       const result = await courseCollection.find().toArray();
       res.send(result);
     });
-
-    // course add api
+    // single data api
+    app.get("/courses/:id", async (req, res) => {
+      const { id } = req.params;
+      const cursor = { _id: new ObjectId(id) };
+      const result = await courseCollection.findOne(cursor);
+      res.send(result);
+    });
+    // course added api
     app.post("/course", async (req, res) => {
       const courseData = req.body;
       const result = await courseCollection.insertOne(courseData);
       res.send(result);
     });
-    // my course get
+    // my course get api
     app.get("/myCourse", async (req, res) => {
       const email = req.query.email;
       let query = {};
@@ -54,7 +60,7 @@ async function run() {
       res.send(result);
     });
 
-    // my course delete
+    // my course delete api
     app.delete("/myCourse/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
