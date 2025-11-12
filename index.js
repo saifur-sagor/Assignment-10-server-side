@@ -1,7 +1,9 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
-const cors = require("cors");
+const cors = require("cors", {
+  origin: ["https://learnhub55.netlify.app", "http://localhost:5173/"],
+});
 const port = process.env.PORT || 4000;
 
 // middle ware
@@ -23,6 +25,7 @@ async function run() {
     await client.connect();
     const db = client.db("e_learning_db");
     const courseCollection = db.collection("course");
+    const enrollCollection = db.collection("enrollments");
     // six data api
     app.get("/course", async (req, res) => {
       const result = await courseCollection.find().limit(6).toArray();
@@ -70,7 +73,7 @@ async function run() {
     // my course update api
     app.put("/myCourse/:id", async (req, res) => {
       const id = req.params.id;
-      const updatedData = req.body; // frontend থেকে আসা updated তথ্য
+      const updatedData = req.body;
       const objectId = { _id: new ObjectId(id) };
 
       const updateDoc = {
@@ -88,7 +91,23 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // enroll  course
+    app.post("/enroll", async (req, res) => {
+      const enrollment = req.body;
+      const result = await enrollCollection.insertOne(enrollment);
+      res.send(result);
+    });
+    app.get("/myEnroll", async (req, res) => {
+      const email = req.query.email;
+      let query = {};
+      if (email) {
+        query = { userEmail: email };
+      }
+      const result = await enrollCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
