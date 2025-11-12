@@ -67,6 +67,26 @@ async function run() {
       const result = await courseCollection.deleteOne(query);
       res.send(result);
     });
+    // my course update api
+    app.put("/myCourse/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedData = req.body; // frontend থেকে আসা updated তথ্য
+      const objectId = { _id: new ObjectId(id) };
+
+      const updateDoc = {
+        $set: {
+          title: updatedData.title,
+          image: updatedData.image,
+          price: updatedData.price,
+          duration: updatedData.duration,
+          category: updatedData.category,
+          description: updatedData.description,
+        },
+      };
+
+      const result = await courseCollection.updateOne(objectId, updateDoc);
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
